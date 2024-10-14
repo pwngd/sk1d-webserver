@@ -1,19 +1,20 @@
-import fastify from 'fastify'
-import fastifyStatic from '@fastify/static'
-import path from 'node:path'
+const fastify = require('fastify');
+const fastifyStatic = require('@fastify/static');
+const path = require('path');
 
-const server = fastify({ logger: true })
+const server = fastify({ logger: true });
 
 server.register(fastifyStatic, {
-  root: path.join(import.meta.dirname, 'public')
-})
+  root: path.join(__dirname, 'public'),
+});
 
 const start = async () => {
   try {
-    await server.listen({ port: 80 })
+    await server.listen(80);
   } catch (err) {
-    server.log.error(err)
-    process.exit(1)
+    server.log.error(err);
+    process.exit(1);
   }
-}
-start()
+};
+
+start();
