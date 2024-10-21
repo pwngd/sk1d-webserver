@@ -1,8 +1,10 @@
 :root {
     --bg1-clr: rgba(0,0,0,0.5);
     --bg2-clr: rgba(20,20,20,0.8);
-    --bg2a-clr: rgba(25,25,25,0.7);
+    --bg2a-clr: rgba(0, 0, 0, 0.4);
+    --bg3-clr: rgba(59, 59, 59, 0.2);
     --fg1-clr: #FDFEFD;
+    --brdr-radius: 15px;
 }
 
 body {
@@ -11,6 +13,7 @@ body {
     display: flex;
     background-color: black;
     color: var(--fg1-clr);
+    text-shadow: 2px 2px 7px #838383;
 }
 
 h1 {
@@ -19,14 +22,14 @@ h1 {
 
 .sidebar {
     height: 100vh;
-    width: 10%;
+    width: 7%;
     min-width: 140px;
-    max-width: 300px;
-    background-color: linear-gradient(180deg, var(--bg2-clr), var(--bg2a-clr));
+    max-width: 170px;
+    background-image: linear-gradient(30deg, var(--bg2-clr), var(--bg2a-clr));
     padding: 20px;
     box-sizing: border-box;
     text-align: center;
-    backdrop-filter: blur(10px);
+    backdrop-filter: blur(15px);
 }
 
 .sidebar a {
@@ -53,9 +56,12 @@ h1 {
 .main-content {
     flex: 1;
     padding: 20px;
+    padding-top: 0px;
+    margin: 10px;
     box-sizing: border-box;
     background-color: var(--bg1-clr);
     backdrop-filter: blur(5px);
+    border-radius: var(--brdr-radius);
 }
 
 .bg-canvas {
@@ -66,4 +72,23 @@ h1 {
     height: 100%;
     z-index: -1;
     display: block;
+}
+
+#top-bar {
+    width: calc(100% + 40px);
+    background-color: var(--bg2a-clr);
+    box-sizing: border-box;
+    margin-left: -20px;
+    margin-right: -20px;
+    border-top-left-radius: var(--brdr-radius);
+    border-top-right-radius: var(--brdr-radius);
+    padding: 10px;
+    backdrop-filter: blur(15px);
+}
+
+#top-bar h1 {
+    margin: 0px;
+    padding: 5px;
+    background-color: var(--bg3-clr);
+    border-radius: var(--brdr-radius);
 }

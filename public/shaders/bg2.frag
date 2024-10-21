@@ -61,7 +61,7 @@ void main()
 	t *= b.z *0.125 ; 
 	
 
-	vec2 vig = p*0.43;
+	vec2 vig = p*0.0;
 	vig.y *= aspect;
 	float vig_amount = 1.0- length(vig);
 	vec4 color = vec4( t*2.0, 1. )* vig_amount;
