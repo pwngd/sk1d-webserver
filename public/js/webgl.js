@@ -1,4 +1,6 @@
 window.onload = async function() {
+    const FRAGMENT_SHADER = './shaders/bg2.frag';
+
     async function loadShader(url) {
         const response = await fetch(url);
         if (!response.ok) {
@@ -6,23 +8,6 @@ window.onload = async function() {
         }
         return await response.text();
     }
-
-    const canvas = document.createElement('canvas');
-    canvas.className = "bg-canvas";
-    document.body.appendChild(canvas);
-    const gl = canvas.getContext('webgl');
-
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
-
-    const vertexShaderSource = `
-        attribute vec4 a_position;
-        void main() {
-            gl_Position = a_position;
-        }
-    `;
-
-    const fragmentShaderSource = await loadShader("./shaders/copied_travel.glsl");
 
     function createShader(gl, type, source) {
         const shader = gl.createShader(type);
@@ -34,6 +19,23 @@ window.onload = async function() {
         console.error('Error compiling shader:', gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
     }
+
+    const canvas = document.createElement('canvas');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    canvas.className = 'bg-canvas';
+    document.body.appendChild(canvas);
+
+    const gl = canvas.getContext('webgl');
+
+    const vertexShaderSource = `
+        attribute vec4 a_position;
+        void main() {
+            gl_Position = a_position;
+        }
+    `;
+
+    const fragmentShaderSource = await loadShader(FRAGMENT_SHADER);
 
     const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
     const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
@@ -61,17 +63,29 @@ window.onload = async function() {
     gl.enableVertexAttribArray(positionLocation);
     gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
-    const timeLocation = gl.getUniformLocation(program, 'u_time');
+    const uTime = gl.getUniformLocation(program, 'time');
+    const uRes = gl.getUniformLocation(program, 'resolution');
+    const uMouse = gl.getUniformLocation(program, 'mouse');
+
+    let mouseX = 0;
+    let mouseY = 0;
 
     function animate(time) {
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
         
-        gl.uniform1f(timeLocation, time * 0.001);
+        gl.uniform1f(uTime, time * 0.001);
+        gl.uniform2f(uRes, canvas.width, canvas.height);
+        gl.uniform2f(uMouse, mouseX, mouseY);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
         requestAnimationFrame(animate);
     }
+
+    window.addEventListener('mousemove', (event) => {
+        mouseX = event.clientX / window.innerWidth;
+        mouseY = -event.clientY / window.innerHeight;
+    });
 
     window.addEventListener('resize', () => {
         canvas.width = window.innerWidth;

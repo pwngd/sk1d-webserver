@@ -1,6 +1,7 @@
 :root {
     --bg1-clr: rgba(0,0,0,0.5);
     --bg2-clr: rgba(20,20,20,0.8);
+    --bg2a-clr: rgba(25,25,25,0.7);
     --fg1-clr: #FDFEFD;
 }
 
@@ -8,7 +9,7 @@ body {
     margin: 0;
     font-family: Arial, sans-serif;
     display: flex;
-    background-color: var(black);
+    background-color: black;
     color: var(--fg1-clr);
 }
 
@@ -21,10 +22,11 @@ h1 {
     width: 10%;
     min-width: 140px;
     max-width: 300px;
-    background-color: var(--bg2-clr);
+    background-color: linear-gradient(180deg, var(--bg2-clr), var(--bg2a-clr));
     padding: 20px;
     box-sizing: border-box;
     text-align: center;
+    backdrop-filter: blur(10px);
 }
 
 .sidebar a {
