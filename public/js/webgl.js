@@ -1,5 +1,5 @@
 window.onload = async function() {
-    const FRAGMENT_SHADER = './shaders/bg2.frag';
+    const FRAGMENT_SHADER = "./shaders/bg2.frag";
 
     async function loadShader(url) {
         const response = await fetch(url);
@@ -16,17 +16,17 @@ window.onload = async function() {
         if (gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
             return shader;
         }
-        console.error('Error compiling shader:', gl.getShaderInfoLog(shader));
+        console.error("Error compiling shader:", gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
     }
 
-    const canvas = document.createElement('canvas');
+    const canvas = document.createElement("canvas");
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    canvas.className = 'bg-canvas';
+    canvas.className = "bg-canvas";
     document.body.appendChild(canvas);
 
-    const gl = canvas.getContext('webgl');
+    const gl = canvas.getContext("webgl");
 
     const vertexShaderSource = `
         attribute vec4 a_position;
@@ -59,13 +59,13 @@ window.onload = async function() {
     ]);
     gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 
-    const positionLocation = gl.getAttribLocation(program, 'a_position');
+    const positionLocation = gl.getAttribLocation(program, "a_position");
     gl.enableVertexAttribArray(positionLocation);
     gl.vertexAttribPointer(positionLocation, 2, gl.FLOAT, false, 0, 0);
 
-    const uTime = gl.getUniformLocation(program, 'time');
-    const uRes = gl.getUniformLocation(program, 'resolution');
-    const uMouse = gl.getUniformLocation(program, 'mouse');
+    const uTime = gl.getUniformLocation(program, "time");
+    const uRes = gl.getUniformLocation(program, "resolution");
+    const uMouse = gl.getUniformLocation(program, "mouse");
 
     let mouseX = 0;
     let mouseY = 0;
@@ -82,12 +82,12 @@ window.onload = async function() {
         requestAnimationFrame(animate);
     }
 
-    window.addEventListener('mousemove', (event) => {
+    window.addEventListener("mousemove", (event) => {
         mouseX = event.clientX / window.innerWidth;
         mouseY = -event.clientY / window.innerHeight;
     });
 
-    window.addEventListener('resize', () => {
+    window.addEventListener("resize", () => {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
         gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
