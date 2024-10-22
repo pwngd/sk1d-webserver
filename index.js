@@ -13,7 +13,7 @@ server.register(fastifyStatic, {
 server.register(pov, {
   engine: { ejs },
   root: path.join(__dirname, "views"),
-  layout:"./layouts/layout.ejs"
+  layout: "./layouts/layout.ejs"
 });
 
 server.get("/", async (req, rep) => {
