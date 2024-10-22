@@ -3,6 +3,7 @@ const path = require("path");
 const fastifyStatic = require("@fastify/static");
 const pov = require("@fastify/view");
 const ejs = require("ejs");
+const renderPlugin = require("./plugins/renderPlugin.js");
 
 const server = fastify({ logger: true });
 
@@ -12,17 +13,10 @@ server.register(fastifyStatic, {
 
 server.register(pov, {
   engine: { ejs },
-  root: path.join(__dirname, "views"),
-  layout: "./layouts/layout.ejs"
+  root: path.join(__dirname, "views")
 });
 
-server.get("/", async (req, rep) => {
-  return rep.viewAsync("index",  { title:"homepage" });
-});
-
-server.get("/test", async (req, rep) => {
-  return rep.viewAsync("test",  { title:"testpage" });
-});
+server.register(renderPlugin);
 
 const start = async () => {
   try {
