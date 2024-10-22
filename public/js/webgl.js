@@ -1,4 +1,5 @@
 let iterationsUniform = 64;
+let shaderSpeed = 0.00025;
 
 window.addEventListener("load", async function() {
     const FRAGMENT_SHADER = "./assets/shaders/bg2.frag";
@@ -21,6 +22,14 @@ window.addEventListener("load", async function() {
         console.error("Error compiling shader:", gl.getShaderInfoLog(shader));
         gl.deleteShader(shader);
     }
+
+    let mouseX = 0;
+    let mouseY = 0;
+
+    window.addEventListener("mousemove", (event) => {
+        mouseX = event.clientX / window.innerWidth;
+        mouseY = -event.clientY / window.innerHeight;
+    });
 
     const canvas = document.createElement("canvas");
     canvas.width = window.innerWidth;
@@ -70,16 +79,13 @@ window.addEventListener("load", async function() {
     const uMouse = gl.getUniformLocation(program, "mouse");
     const uIter = gl.getUniformLocation(program, "iterations");
 
-    let mouseX = 0;
-    let mouseY = 0;
-
     gl.uniform1i(uIter, iterationsUniform);
 
     function animate(time) {
         gl.clearColor(0, 0, 0, 1);
         gl.clear(gl.COLOR_BUFFER_BIT);
         
-        gl.uniform1f(uTime, time * 0.001);
+        gl.uniform1f(uTime, time * shaderSpeed);
         gl.uniform2f(uRes, canvas.width, canvas.height);
         gl.uniform2f(uMouse, mouseX, mouseY);
         gl.uniform1i(uIter, iterationsUniform);
@@ -88,10 +94,7 @@ window.addEventListener("load", async function() {
         requestAnimationFrame(animate);
     }
 
-    window.addEventListener("mousemove", (event) => {
-        mouseX = event.clientX / window.innerWidth;
-        mouseY = -event.clientY / window.innerHeight;
-    });
+    
 
     window.addEventListener("resize", () => {
         canvas.width = window.innerWidth;

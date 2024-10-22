@@ -34,12 +34,21 @@ window.addEventListener("load", async ()=>{
     const greeting = document.getElementById("greeting");
     const parent = document.getElementById("main-content");
     const mainWindow = document.getElementById("main-window");
+    const clock = document.getElementById("clock");
 
     mainWindow.style.margin = "100px";
 
-    const audio_bgm = document.getElementById('audio-bgm');
-    const audio_launch = document.getElementById('audio-launch');
-    const audio_notice = document.getElementById('audio-notice');
+    const audio_bgm = document.getElementById("audio-bgm");
+    const audio_launch = document.getElementById("audio-launch");
+    const audio_notice = document.getElementById("audio-notice");
+    
+    const localeString = { hour: "numeric", minute: "numeric", hour12: true };
+
+    clock.innerText = (new Date()).toLocaleString("en-US", localeString);
+
+    setInterval(() => {
+        clock.innerText = (new Date()).toLocaleString("en-US", localeString);
+    }, 2500);
 
     function launch() {
         if (launched==true) {return;}
@@ -50,9 +59,10 @@ window.addEventListener("load", async ()=>{
 
         audio_launch.play();
 
-        for (let i = 64; i < 128; i++) {
+        for (let i = 0; i < 256; i++) {
             setTimeout(()=>{
-                iterationsUniform = i;
+                iterationsUniform = Math.min(i+64,128);
+                shaderSpeed = 0.00025 * Math.pow(10, 1 - Math.pow(1 - (i / 256), 2));
             }, 5 * i);
         }
 
@@ -61,18 +71,21 @@ window.addEventListener("load", async ()=>{
             audio_bgm.play();
         }, 320);
 
-        window.addEventListener("keydown", (event) => {
-            if (event.key.toLowerCase() == "t") {
-                if (cachedWindow == null) return;
-                cachedWindow.append(parent);
-                audio_notice.currentTime = 0;
-                audio_notice.play();
-                cachedWindow = new Container("test", "100%", "window");
-                cachedWindow.element.style.flexDirection = (currentDepth % 2 === 0) ? "row" : "column";
-                currentDepth += 1;
+        window.addEventListener("keydown", (event)=>{
+            switch (event.key.toLowerCase()) {
+                case "t":
+                    if (cachedWindow == null) break;
+                    cachedWindow.append(parent);
+                    audio_notice.currentTime = 0;
+                    audio_notice.play();
+                    cachedWindow = new Container("test", "100%", "window");
+                    cachedWindow.element.style.flexDirection = (currentDepth % 2 === 0) ? "row" : "column";
+                    currentDepth += 1;
+                    break;
             }
         });
     }
 
     window.addEventListener("click", launch);
+    window.addEventListener("touchstart", launch);
 });
