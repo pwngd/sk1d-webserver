@@ -1,5 +1,7 @@
+let iterationsUniform = 64;
+
 window.addEventListener("load", async function() {
-    const FRAGMENT_SHADER = "./shaders/bg2.frag";
+    const FRAGMENT_SHADER = "./assets/shaders/bg2.frag";
 
     async function loadShader(url) {
         const response = await fetch(url);
@@ -66,9 +68,12 @@ window.addEventListener("load", async function() {
     const uTime = gl.getUniformLocation(program, "time");
     const uRes = gl.getUniformLocation(program, "resolution");
     const uMouse = gl.getUniformLocation(program, "mouse");
+    const uIter = gl.getUniformLocation(program, "iterations");
 
     let mouseX = 0;
     let mouseY = 0;
+
+    gl.uniform1i(uIter, iterationsUniform);
 
     function animate(time) {
         gl.clearColor(0, 0, 0, 1);
@@ -77,6 +82,7 @@ window.addEventListener("load", async function() {
         gl.uniform1f(uTime, time * 0.001);
         gl.uniform2f(uRes, canvas.width, canvas.height);
         gl.uniform2f(uMouse, mouseX, mouseY);
+        gl.uniform1i(uIter, iterationsUniform);
         gl.drawArrays(gl.TRIANGLES, 0, 6);
 
         requestAnimationFrame(animate);

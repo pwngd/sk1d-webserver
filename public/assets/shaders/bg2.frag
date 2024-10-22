@@ -9,6 +9,7 @@ precision mediump float;
 uniform float time;
 uniform vec2 mouse;
 uniform vec2 resolution;
+uniform int iterations;
 
 const vec3 diffuse = vec3( .99, .65, 0.2 );
 const vec3 eps = vec3( .001, 0., 0. );
@@ -48,6 +49,7 @@ void main()
 	
 	for( int i = 0; i < iter; ++i )
 	{
+		if (i>= iterations) {break;}
 		float h = c( b + s + o );
 		//if( h < 0. )
 		//	break;

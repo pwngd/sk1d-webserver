@@ -26,15 +26,53 @@ class Container {
     }
 }
 
+let launched = false;
 let cachedWindow = new Container("test", "100%", "window");
 let currentDepth = 0;
 
-window.addEventListener("keydown", (event) => {
-    if (event.key.toLowerCase() == "t") {
-        if (cachedWindow == null) return;
-        cachedWindow.append(document.body);
-        cachedWindow = new Container("test", "100%", "window");
-        cachedWindow.element.style.flexDirection = (currentDepth % 2 === 0) ? "row" : "column";
-        currentDepth += 1;
+window.addEventListener("load", async ()=>{
+    const greeting = document.getElementById("greeting");
+    const parent = document.getElementById("main-content");
+    const mainWindow = document.getElementById("main-window");
+
+    mainWindow.style.margin = "100px";
+
+    const audio_bgm = document.getElementById('audio-bgm');
+    const audio_launch = document.getElementById('audio-launch');
+    const audio_notice = document.getElementById('audio-notice');
+
+    function launch() {
+        if (launched==true) {return;}
+        launched = true;
+        greeting.style.opacity = 0;
+        parent.style.opacity = 1;
+        mainWindow.style.margin = "10px";
+
+        audio_launch.play();
+
+        for (let i = 64; i < 128; i++) {
+            setTimeout(()=>{
+                iterationsUniform = i;
+            }, 5 * i);
+        }
+
+        setTimeout(()=>{
+            greeting.remove();
+            audio_bgm.play();
+        }, 320);
+
+        window.addEventListener("keydown", (event) => {
+            if (event.key.toLowerCase() == "t") {
+                if (cachedWindow == null) return;
+                cachedWindow.append(parent);
+                audio_notice.currentTime = 0;
+                audio_notice.play();
+                cachedWindow = new Container("test", "100%", "window");
+                cachedWindow.element.style.flexDirection = (currentDepth % 2 === 0) ? "row" : "column";
+                currentDepth += 1;
+            }
+        });
     }
+
+    window.addEventListener("click", launch);
 });

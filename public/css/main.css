@@ -11,7 +11,6 @@
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    display: flex;
     background-color: black;
     color: var(--fg1-clr);
     text-shadow: 2px 2px 7px #838383;
@@ -19,6 +18,30 @@ body {
 
 h1 {
     font-weight: bold;
+}
+
+#main-content {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+#greeting {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 100000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(0, 0, 0, 0.557);
+    backdrop-filter: blur(5px);
+    width: 100%;
+    height: 100%;
+    opacity: 1;
+    transition: opacity 0.3s ease;
 }
 
 .sidebar {
@@ -54,11 +77,8 @@ h1 {
     width: 100%;
 }
 
-.main-content {
-    flex: 100%;
-}
-
 .window {
+    flex: 100%;
     padding: 20px;
     padding-top: 0px;
     margin: 10px;
