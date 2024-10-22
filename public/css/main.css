@@ -55,7 +55,7 @@ h1 {
 }
 
 .main-content {
-    flex: 1;
+    flex: 100%;
 }
 
 .window {

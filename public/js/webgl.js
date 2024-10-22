@@ -1,4 +1,4 @@
-window.onload = async function() {
+window.addEventListener("load", async function() {
     const FRAGMENT_SHADER = "./shaders/bg2.frag";
 
     async function loadShader(url) {
@@ -94,4 +94,4 @@ window.onload = async function() {
     });
 
     animate(0);
-};
+});
