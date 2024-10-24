@@ -81,15 +81,25 @@ window.addEventListener("load", async function() {
 
     gl.uniform1i(uIter, iterationsUniform);
 
+    // avoid cooking cpu by limiting fps!!
+    const fps = 120;
+    const interval = 1000 / fps;
+    let lastTime = 0;
+
     function animate(time) {
-        gl.clearColor(0, 0, 0, 1);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-        
-        gl.uniform1f(uTime, time * shaderSpeed);
-        gl.uniform2f(uRes, canvas.width, canvas.height);
-        gl.uniform2f(uMouse, mouseX, mouseY);
-        gl.uniform1i(uIter, iterationsUniform);
-        gl.drawArrays(gl.TRIANGLES, 0, 6);
+        const deltaTime = time - lastTime;
+
+        if (deltaTime > interval) {
+            lastTime = time - (deltaTime % interval);
+            gl.clearColor(0, 0, 0, 1);
+            gl.clear(gl.COLOR_BUFFER_BIT);
+            
+            gl.uniform1f(uTime, time * shaderSpeed);
+            gl.uniform2f(uRes, canvas.width, canvas.height);
+            gl.uniform2f(uMouse, mouseX, mouseY);
+            gl.uniform1i(uIter, iterationsUniform);
+            gl.drawArrays(gl.TRIANGLES, 0, 6);
+        }
 
         requestAnimationFrame(animate);
     }

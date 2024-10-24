@@ -6,7 +6,8 @@ class Container {
         this.element.className = className;
         this.element.style.flex = "0";
         this.element.style.margin = "30px";
-        
+        this.element.style.transform = "skewX(30deg) skewY(50deg) scaleY(0.3)";
+        this.element.style.filter = "blur(3px)";
 
         this.topbar = document.createElement("div");
         this.topbar.className = "top-bar";
@@ -22,15 +23,102 @@ class Container {
         setTimeout(() => {
             this.element.style.flex = this.flex;
             this.element.style.margin = "10px";
+            this.element.style.transform = "";
+            this.element.style.filter = "";
         }, 50);
+    }
+
+    destroy() {
+        this.title.remove();
+        this.topbar.remove();
+        this.element.remove();
+        this.element = null;
+        this.topbar = null;
+        this.title = null;
+    }
+
+    close() {
+        this.element.style.flex = "0.1";
+        this.element.style.margin = "15px";
+        this.element.style.transform = "skewX(-30deg) skewY(-50deg) translateY(-5px) translateX(10px)";
+        this.element.style.filter = "blur(20px)";
+        setTimeout(()=>{this.destroy()}, 100);
     }
 }
 
-let launched = false;
+const pageCache = {};
+
+function getRandomInt(max) {
+    return Math.floor(Math.random() * (max + 1));
+}
+
+function replaceChar(str, index, char) {
+    return str.slice(0, index) + char + str.slice(index + 1);
+}
+
+async function animateTyping(element, text) {
+    let i = 0;
+    let typed = "";
+    const textLen = text.length;
+    const typingInterval = setInterval(()=>{
+        if (i < textLen) {
+            typed += text[i];
+            element.innerHTML = typed;
+            i++;
+        } else {
+            clearInterval(typingInterval);
+            element.innerHTML = typed;
+        }
+    }, 7);
+}
+
+async function cachePage(url) {
+    if (pageCache[url]!=null) return;
+    pageCache[url] = {loaded: false, html: null};
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", url, true);
+    xhr.setRequestHeader("X-Requested-With", "XMLHttpRequest");
+    xhr.onload = () => {
+        if (xhr.status != 200) return;
+        pageCache[url].html = xhr.responseText;
+    }
+    xhr.send();
+}
+
+async function loadPage(url) {
+    const content = document.getElementById("content");
+    let html = null;
+
+    if (pageCache[url] === null) {
+        if (pageCache[url].loaded === false) return;
+        await cachePage(url);
+    }
+
+    html = pageCache[url].html;
+
+    content.innerHTML = html;
+    window.history.pushState({ path: url }, "", url);
+
+    const title = document.getElementById("data-title");
+    if (title!=null) {
+        animateTyping(document.getElementById("page-title"), title.innerHTML);
+    } else {
+        animateTyping(document.getElementById("page-title"), "unknown");
+    }
+}
+
+window.onpopstate = (event) => {
+    if (event.state && event.state.path) {
+        loadPage(event.state.path);
+    }
+}
+
 let cachedWindow = new Container("test", "100%", "window");
-let currentDepth = 0;
 
 window.addEventListener("load", async ()=>{
+    let launched = false;
+    let windowsStack = [];
+
     const greeting = document.getElementById("greeting");
     const parent = document.getElementById("main-content");
     const mainWindow = document.getElementById("main-window");
@@ -41,6 +129,7 @@ window.addEventListener("load", async ()=>{
     const audio_bgm = document.getElementById("audio-bgm");
     const audio_launch = document.getElementById("audio-launch");
     const audio_notice = document.getElementById("audio-notice");
+    const audio_notice_back = document.getElementById("audio-notice-back");
     
     const localeString = { hour: "numeric", minute: "numeric", hour12: true };
 
@@ -75,12 +164,19 @@ window.addEventListener("load", async ()=>{
             switch (event.key.toLowerCase()) {
                 case "t":
                     if (cachedWindow == null) break;
+
                     cachedWindow.append(parent);
+                    windowsStack.push(cachedWindow);
+
                     audio_notice.currentTime = 0;
                     audio_notice.play();
                     cachedWindow = new Container("test", "100%", "window");
-                    cachedWindow.element.style.flexDirection = (currentDepth % 2 === 0) ? "row" : "column";
-                    currentDepth += 1;
+                    break;
+                case "w":
+                    audio_notice_back.currentTime = 0;
+                    audio_notice_back.play();
+                    windowsStack[windowsStack.length-1].close();
+                    windowsStack.pop();
                     break;
             }
         });
@@ -88,4 +184,18 @@ window.addEventListener("load", async ()=>{
 
     window.addEventListener("click", launch);
     window.addEventListener("touchstart", launch);
+
+    const links = document.getElementsByClassName("sidebar")[0].getElementsByTagName("a");
+
+    for (let i=0; i<links.length; i++) {
+        links[i].addEventListener("click", ()=>{
+            audio_notice.currentTime = 0;
+            audio_notice.play();
+            loadPage(links[i].href);
+        });
+
+        links[i].addEventListener("mouseover", ()=>{
+            cachePage(links[i].href);
+        });
+    }
 });

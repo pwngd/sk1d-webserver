@@ -13,6 +13,7 @@
     <audio preload="auto" id="audio-launch" src="./assets/audio/launch.mp3" type="audio/mp3"></audio>
     <audio preload="auto" loop id="audio-bgm" src="./assets/audio/bgm.mp3" type="audio/mp3"></audio>
     <audio preload="auto" id="audio-notice" src="./assets/audio/notice.mp3" type="audio/mp3"></audio>
+    <audio preload="auto" id="audio-notice-back" src="./assets/audio/notice_back.mp3" type="audio/mp3"></audio>
 </head>
 <body>
     <noscript>Javascript is not enabled. The site will not function.</noscript>
@@ -23,20 +24,20 @@
 
     <div id="main-content">
         <div class="sidebar">
-            <a href="#">
-                <img src="./assets/icons/home.svg"/>
+            <a id="link-home" href="/" onclick="event.preventDefault();">
+                <img  src="./assets/icons/home.svg" draggable="false"/>
             </a>
     
-            <a href="#">
-                <img src="./assets/icons/photo.svg"/>
+            <a id="link-photo" href="/test" onclick="event.preventDefault();">
+                <img src="./assets/icons/photo.svg" draggable="false"/>
             </a>
     
-            <a href="#">
-                <img src="./assets/icons/videos.svg"/>
+            <a id="link-videos" href="/videos" onclick="event.preventDefault();">
+                <img src="./assets/icons/videos.svg" draggable="false"/>
             </a>
 
-            <a href="#">
-                <img src="./assets/icons/chat.svg"/>
+            <a id="link-chat" href="/chat" onclick="event.preventDefault();">
+                <img src="./assets/icons/chat.svg" draggable="false"/>
             </a>
 
             <h2 id="clock"></h2>
@@ -44,9 +45,11 @@
     
         <div id="main-window" class="window">
             <div class="top-bar">
-                <h1>sk1d > <%= title %></h1>
+                <h1>sk1d > <span id="page-title"><%= title %></span></h1>
             </div>
-            <%- body %>
+            <div id="content">
+                <%- body %>
+            </div>
         </div>
     </div>
 </body>
