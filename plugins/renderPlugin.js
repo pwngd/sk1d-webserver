@@ -1,7 +1,7 @@
-module.exports = (server, opts, done) => {
+module.exports = async (fastify, opts) => {
     function isAjax(req) {return req.headers["x-requested-with"] === "XMLHttpRequest"};
 
-    server.get("/", async (req, rep) => {
+    fastify.get("/", async (req, rep) => {
         const data = { title:"homepage" };
 
         if (isAjax(req)) {
@@ -11,7 +11,7 @@ module.exports = (server, opts, done) => {
         }
     });
     
-    server.get("/test", async (req, rep) => {
+    fastify.get("/test", async (req, rep) => {
         const data = { title:"testpage" };
 
         if (isAjax(req)) {
@@ -21,7 +21,7 @@ module.exports = (server, opts, done) => {
         }
     });
 
-    server.get("/chat", async (req, rep) => {
+    fastify.get("/chat", async (req, rep) => {
         const data = { title:"chatroom" };
 
         if (isAjax(req)) {
@@ -30,6 +30,4 @@ module.exports = (server, opts, done) => {
             return rep.viewAsync("chat", data, { layout: "./layouts/layout.ejs" });
         }
     });
-
-    done();
-}
+};

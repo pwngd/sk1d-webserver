@@ -46,6 +46,7 @@ class Container {
     }
 }
 
+const socket = io();
 const urlParams = new URLSearchParams(window.location.search);
 const pageCache = {};
 
