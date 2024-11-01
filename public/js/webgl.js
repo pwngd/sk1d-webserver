@@ -1,8 +1,25 @@
-let iterationsUniform = 64;
-let shaderSpeed = 0.00025;
+let webglFadeInFunc = null;
 
 window.addEventListener("load", async function() {
+    const fpsElem = document.getElementById("fps");
     const FRAGMENT_SHADER = "./assets/shaders/bg2.frag";
+    const baseWidth = 640;
+    const baseHeight = 360;
+    let aspectRatio = window.innerWidth / window.innerHeight;
+    let mouseX = 0;
+    let mouseY = 0;
+    let shaderSpeed = 0.00025;
+
+    function updateSize(canvas, gl, uRes) {
+        aspectRatio = window.innerWidth / window.innerHeight;
+        const renderWidth = Math.floor(baseWidth * Math.min(1, aspectRatio));
+        const renderHeight = Math.floor(renderWidth / aspectRatio);
+        canvas.width = renderWidth;
+        canvas.height = renderHeight;
+        gl.viewport(0, 0, renderWidth, renderHeight);
+        
+        if (uRes) gl.uniform2f(uRes, renderWidth, renderHeight);
+    }
 
     async function loadShader(url) {
         const response = await fetch(url);
@@ -23,21 +40,11 @@ window.addEventListener("load", async function() {
         gl.deleteShader(shader);
     }
 
-    let mouseX = 0;
-    let mouseY = 0;
-
-    window.addEventListener("mousemove", (event) => {
-        mouseX = event.clientX / window.innerWidth;
-        mouseY = -event.clientY / window.innerHeight;
-    });
-
     const canvas = document.createElement("canvas");
-    canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    const gl = canvas.getContext("webgl", {antialias:true});
     canvas.className = "bg-canvas";
+    updateSize(canvas, gl);
     document.body.appendChild(canvas);
-
-    const gl = canvas.getContext("webgl");
 
     const vertexShaderSource = `
         attribute vec4 a_position;
@@ -79,38 +86,51 @@ window.addEventListener("load", async function() {
     const uMouse = gl.getUniformLocation(program, "mouse");
     const uIter = gl.getUniformLocation(program, "iterations");
 
-    gl.uniform1i(uIter, iterationsUniform);
+    gl.uniform2f(uRes, canvas.width, canvas.height);
+    gl.uniform1i(uIter, 64);
 
-    // avoid cooking cpu by limiting fps!!
-    const fps = 120;
-    const interval = 1000 / fps;
+    webglFadeInFunc = (instant) => {
+        if (instant) {
+            gluniform1i(uIter, 128);
+            shaderSpeed = 0.0025;
+            return;
+        }
+        for (let i = 0; i < 256; i++) {
+            setTimeout(()=>{
+                gl.uniform1i(uIter, Math.min(i+64,128));
+                shaderSpeed = 0.00025 * Math.pow(10, 1 - Math.pow(1 - (i / 256), 2));
+            }, 5 * i);
+        };
+    };
+
     let lastTime = 0;
 
     function animate(time) {
         const deltaTime = time - lastTime;
 
-        if (deltaTime > interval) {
-            lastTime = time - (deltaTime % interval);
-            gl.clearColor(0, 0, 0, 1);
-            gl.clear(gl.COLOR_BUFFER_BIT);
-            
-            gl.uniform1f(uTime, time * shaderSpeed);
-            gl.uniform2f(uRes, canvas.width, canvas.height);
-            gl.uniform2f(uMouse, mouseX, mouseY);
-            gl.uniform1i(uIter, iterationsUniform);
-            gl.drawArrays(gl.TRIANGLES, 0, 6);
+        lastTime = time;
+
+        gl.clear(gl.COLOR_BUFFER_BIT);
+        gl.uniform1f(uTime, time * shaderSpeed);
+        gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+        if (time % 2 == 0) {
+            fpsElem.innerHTML = Math.floor(1000 / deltaTime) + "FPS";
         }
 
         requestAnimationFrame(animate);
     }
 
-    
-
-    window.addEventListener("resize", () => {
-        canvas.width = window.innerWidth;
-        canvas.height = window.innerHeight;
-        gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+    window.addEventListener("mousemove", (event) => {
+        mouseX = event.clientX / window.innerWidth;
+        mouseY = -event.clientY / window.innerHeight;
+        gl.uniform2f(uMouse, mouseX, mouseY);
     });
 
+    window.addEventListener("resize", () => {
+        updateSize(canvas, gl, uRes);
+    });
+
+    gl.clearColor(0, 0, 0, 1);
     animate(0);
 });

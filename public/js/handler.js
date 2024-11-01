@@ -46,6 +46,7 @@ class Container {
     }
 }
 
+const urlParams = new URLSearchParams(window.location.search);
 const pageCache = {};
 
 function getRandomInt(max) {
@@ -62,14 +63,15 @@ async function animateTyping(element, text) {
     const textLen = text.length;
     const typingInterval = setInterval(()=>{
         if (i < textLen) {
-            typed += text[i];
             element.innerHTML = typed;
+            element.innerHTML += `${text[i]}|`;
+            typed += text[i];
             i++;
         } else {
             clearInterval(typingInterval);
             element.innerHTML = typed;
         }
-    }, 7);
+    }, 13);
 }
 
 async function cachePage(url) {
@@ -98,6 +100,18 @@ async function loadPage(url) {
 
     content.innerHTML = html;
     window.history.pushState({ path: url }, "", url);
+
+    document.getElementById("main-window").animate(
+        [
+          { margin: "20px" },
+          { margin: "10px" }
+        ],
+        {
+          duration: 300,
+          easing: "cubic-bezier(0.68, -0.55, 0.27, 1.55)",
+          fill: "forwards"
+        }
+      );
 
     const title = document.getElementById("data-title");
     if (title!=null) {
@@ -133,13 +147,15 @@ window.addEventListener("load", async ()=>{
     
     const localeString = { hour: "numeric", minute: "numeric", hour12: true };
 
+    const instantLoad = urlParams.get("instant");
+
     clock.innerText = (new Date()).toLocaleString("en-US", localeString);
 
     setInterval(() => {
         clock.innerText = (new Date()).toLocaleString("en-US", localeString);
     }, 2500);
 
-    function launch() {
+    function launch(instant) {
         if (launched==true) {return;}
         launched = true;
         greeting.style.opacity = 0;
@@ -148,12 +164,7 @@ window.addEventListener("load", async ()=>{
 
         audio_launch.play();
 
-        for (let i = 0; i < 256; i++) {
-            setTimeout(()=>{
-                iterationsUniform = Math.min(i+64,128);
-                shaderSpeed = 0.00025 * Math.pow(10, 1 - Math.pow(1 - (i / 256), 2));
-            }, 5 * i);
-        }
+        webglFadeInFunc();
 
         setTimeout(()=>{
             greeting.remove();
