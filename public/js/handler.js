@@ -73,6 +73,17 @@ async function animateTyping(element, text) {
             element.innerHTML = typed;
         }
     }, 13);
+    element.animate(
+        [
+          { opacity: "0" },
+          { margin: "1" }
+        ],
+        {
+          duration: 500,
+          easing: "ease",
+          fill: "forwards"
+        }
+    );
 }
 
 async function cachePage(url) {

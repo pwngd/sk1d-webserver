@@ -1,3 +1,14 @@
+@keyframes fadeInUp {
+    0% {
+      opacity: 0;         /* Start invisible */
+      transform: translateY(20px); /* Start 20px down */
+    }
+    100% {
+      opacity: 1;         /* End fully visible */
+      transform: translateY(0); /* End at original position */
+    }
+}
+
 :root {
     --bg1-clr: rgba(0,0,0,0.5);
     --bg2-clr: rgba(20,20,20,0.8);
@@ -21,6 +32,11 @@ body {
 
 h1 {
     font-weight: bold;
+    animation: fadeInUp 1s ease forwards;
+}
+
+p, h2 {
+    animation: fadeInUp 1s ease forwards;
 }
 
 #content {
