@@ -1,11 +1,11 @@
 @keyframes fadeInUp {
     0% {
-      opacity: 0;         /* Start invisible */
-      transform: translateY(20px); /* Start 20px down */
+      opacity: 0;
+      transform: translateY(20px);
     }
     100% {
-      opacity: 1;         /* End fully visible */
-      transform: translateY(0); /* End at original position */
+      opacity: 1;
+      transform: translateY(0);
     }
 }
 

@@ -50,14 +50,6 @@ const socket = io();
 const urlParams = new URLSearchParams(window.location.search);
 const pageCache = {};
 
-function getRandomInt(max) {
-    return Math.floor(Math.random() * (max + 1));
-}
-
-function replaceChar(str, index, char) {
-    return str.slice(0, index) + char + str.slice(index + 1);
-}
-
 async function animateTyping(element, text) {
     let i = 0;
     let typed = "";
