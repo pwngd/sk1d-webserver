@@ -15,7 +15,7 @@ module.exports = async (fastify, opts) => {
     });
 
     fastify.get("/", async (req, rep) => {
-        const data = { title:"homepage" };
+        const data = { title:"homepage", online: fastify.io.engine.clientsCount };
 
         if (isAjax(req)) {
             return rep.viewAsync("index", data, { layout: DATA_LAYOUT} );

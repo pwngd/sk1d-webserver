@@ -1,11 +1,11 @@
-class Client {
-    let socket = null;
-    let username = null;
+// class Client {
+//     let socket = null;
+//     let username = null;
 
-    constructor(socket, username) {
+//     constructor(socket, username) {
 
-    }
-}
+//     }
+// }
 
 module.exports = async (fastify, opts) => {
     const MAX_CONNECTIONS_PER_IP = 3;

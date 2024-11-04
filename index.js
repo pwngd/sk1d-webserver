@@ -24,6 +24,10 @@ server.register(pov, {
   root: path.join(__dirname, "views")
 });
 
+server.get("/api/online", (req, rep)=>{
+  rep.send(server.io.engine.clientsCount);
+});
+
 const start = async () => {
   try {
     await server.listen({ port: 3000, host: "0.0.0.0" });
