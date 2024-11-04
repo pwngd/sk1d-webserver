@@ -1,6 +1,16 @@
+class Client {
+    let socket = null;
+    let username = null;
+
+    constructor(socket, username) {
+
+    }
+}
+
 module.exports = async (fastify, opts) => {
     const MAX_CONNECTIONS_PER_IP = 3;
     const connections = {};
+    const clients = {};
 
     fastify.ready(err => {
         if (err) {
