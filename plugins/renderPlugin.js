@@ -4,7 +4,7 @@ module.exports = async (fastify, opts) => {
 
     function isAjax(req) {return req.headers["x-requested-with"] === "XMLHttpRequest"};
 
-    fastify.setNotFoundHandler(async (req, rep) => {
+    fastify.setNotFoundHandler({preHandler: fastify.rateLimit({max: 10,timeWindow: 1000})}, async (req, rep) => {
         const data = { title:"404" };
 
         if (isAjax(req)) {
@@ -15,7 +15,7 @@ module.exports = async (fastify, opts) => {
     });
 
     fastify.get("/", async (req, rep) => {
-        const data = { title:"homepage", online: fastify.io.engine.clientsCount };
+        const data = { title:"homepage", online: fastify.io.engine.clientsCount, views: fastify.uniqueIPs.size };
 
         if (isAjax(req)) {
             return rep.viewAsync("index", data, { layout: DATA_LAYOUT} );

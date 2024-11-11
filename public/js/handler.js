@@ -68,7 +68,7 @@ async function animateTyping(element, text) {
     element.animate(
         [
           { opacity: "0" },
-          { margin: "1" }
+          { opacity: "1" }
         ],
         {
           duration: 500,
@@ -119,6 +119,7 @@ async function loadPage(url) {
 
     const title = document.getElementById("data-title");
     if (title!=null) {
+        document.title = title.innerHTML;
         animateTyping(document.getElementById("page-title"), title.innerHTML);
     } else {
         animateTyping(document.getElementById("page-title"), "unknown");
@@ -188,10 +189,48 @@ window.addEventListener("load", async ()=>{
                     cachedWindow = new Container("test", "100%", "window");
                     break;
                 case "w":
+                    if (windowsStack.length<1) break;
                     audio_notice_back.currentTime = 0;
                     audio_notice_back.play();
                     windowsStack[windowsStack.length-1].close();
                     windowsStack.pop();
+                    break;
+                case "q":
+                    (async ()=>{
+                        let state = false;
+                    setInterval(()=>{
+                        if (state) {
+                            audio_notice_back.currentTime = 0;
+                            audio_notice_back.play();
+                            windowsStack[windowsStack.length-1].close();
+                            windowsStack.pop();
+                        } else {
+                            cachedWindow.append(parent);
+                            windowsStack.push(cachedWindow);
+        
+                            audio_notice.currentTime = 0;
+                            audio_notice.play();
+                            cachedWindow = new Container("test", "100%", "window");
+                        }
+                        state = !state;
+                    }, .01);
+                    setInterval(()=>{
+                        if (state) {
+                            audio_notice_back.currentTime = 0;
+                            audio_notice_back.play();
+                            windowsStack[windowsStack.length-1].close();
+                            windowsStack.pop();
+                        } else {
+                            cachedWindow.append(parent);
+                            windowsStack.push(cachedWindow);
+        
+                            audio_notice.currentTime = 0;
+                            audio_notice.play();
+                            cachedWindow = new Container("test", "100%", "window");
+                        }
+                        state = !state;
+                    }, 0.01);
+                    })();
                     break;
             }
         });
@@ -213,4 +252,13 @@ window.addEventListener("load", async ()=>{
             cachePage(links[i].href);
         });
     }
+
+    socket.on("stats", (stats)=>{
+        if (document.title!=="homepage") return;
+        document.getElementById("stats_online").innerText = stats.online;
+        document.getElementById("stats_views").innerText = stats.views;
+        document.getElementById("stats_memory").innerText = stats.memory;
+        document.getElementById("stats_uptime").innerText = stats.uptime;
+        document.getElementById("stats_elapsed").innerText = stats.elapsed;
+    });
 });
