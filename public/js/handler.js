@@ -2,19 +2,18 @@ class Container {
     constructor (windowTitle = "", flex = "100%", className = "window") {
         this.flex = flex;
 
-        this.element = document.createElement("div");
-        this.element.className = className;
-        this.element.style.flex = "0";
-        this.element.style.margin = "30px";
-        this.element.style.transform = "skewX(30deg) skewY(50deg) scaleY(0.3)";
-        this.element.style.filter = "blur(3px)";
+        const template = document.createElement("template");
+        template.innerHTML = `
+        <div class="${className}" style="flex: 0; margin: 30px; transform: skewX(30deg) skewY(50deg) scaleY(0.3); filter: blur(3px);">
+            <div class="top-bar">
+                <h1>${windowTitle}</h1>
+            </div>
+        </div>
+        `;
 
-        this.topbar = document.createElement("div");
-        this.topbar.className = "top-bar";
-        this.title = document.createElement("h1");
-        this.title.innerText = windowTitle;
-        this.topbar.appendChild(this.title);
-        this.element.appendChild(this.topbar);
+        this.element = template.content.cloneNode(true).firstElementChild;
+        this.topbar = this.element.querySelector(".top-bar");
+        this.title = this.topbar.querySelector("h1");
     }
 
     append(parent) {
@@ -49,6 +48,11 @@ class Container {
 const socket = io();
 const urlParams = new URLSearchParams(window.location.search);
 const pageCache = {};
+const members = {};
+
+const pageScripts = {
+    chatroom: "/js/chat.js"
+};
 
 async function animateTyping(element, text) {
     let i = 0;
@@ -91,6 +95,16 @@ async function cachePage(url) {
     xhr.send();
 }
 
+async function loadScript(title) {
+    const script = pageScripts[title];
+    if (script) {
+        let module = await import(script);
+        module.init(socket);
+        return script;
+    }
+    return null;
+}
+
 async function loadPage(url) {
     const content = document.getElementById("content");
     let html = null;
@@ -124,6 +138,8 @@ async function loadPage(url) {
     } else {
         animateTyping(document.getElementById("page-title"), "unknown");
     }
+
+    loadScript(title.innerHTML);
 }
 
 window.onpopstate = (event) => {
@@ -135,8 +151,8 @@ window.onpopstate = (event) => {
 let cachedWindow = new Container("test", "100%", "window");
 
 window.addEventListener("load", async ()=>{
+    const windowsStack = [];
     let launched = false;
-    let windowsStack = [];
 
     const greeting = document.getElementById("greeting");
     const parent = document.getElementById("main-content");
@@ -159,6 +175,10 @@ window.addEventListener("load", async ()=>{
     setInterval(() => {
         clock.innerText = (new Date()).toLocaleString("en-US", localeString);
     }, 2500);
+
+    if (pageScripts[document.title]!==null) {
+        loadScript(document.title);
+    }
 
     function launch(instant) {
         if (launched==true) {return;}
@@ -194,43 +214,6 @@ window.addEventListener("load", async ()=>{
                     audio_notice_back.play();
                     windowsStack[windowsStack.length-1].close();
                     windowsStack.pop();
-                    break;
-                case "q":
-                    (async ()=>{
-                        let state = false;
-                    setInterval(()=>{
-                        if (state) {
-                            audio_notice_back.currentTime = 0;
-                            audio_notice_back.play();
-                            windowsStack[windowsStack.length-1].close();
-                            windowsStack.pop();
-                        } else {
-                            cachedWindow.append(parent);
-                            windowsStack.push(cachedWindow);
-        
-                            audio_notice.currentTime = 0;
-                            audio_notice.play();
-                            cachedWindow = new Container("test", "100%", "window");
-                        }
-                        state = !state;
-                    }, .01);
-                    setInterval(()=>{
-                        if (state) {
-                            audio_notice_back.currentTime = 0;
-                            audio_notice_back.play();
-                            windowsStack[windowsStack.length-1].close();
-                            windowsStack.pop();
-                        } else {
-                            cachedWindow.append(parent);
-                            windowsStack.push(cachedWindow);
-        
-                            audio_notice.currentTime = 0;
-                            audio_notice.play();
-                            cachedWindow = new Container("test", "100%", "window");
-                        }
-                        state = !state;
-                    }, 0.01);
-                    })();
                     break;
             }
         });

@@ -1,5 +1,4 @@
 let webglFadeInFunc = null;
-
 window.addEventListener("load", async function() {
     const fpsElem = document.getElementById("fps");
     const FRAGMENT_SHADER = "./assets/shaders/bg2.frag";

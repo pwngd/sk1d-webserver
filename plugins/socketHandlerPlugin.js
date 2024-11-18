@@ -1,6 +1,7 @@
 module.exports = async (fastify, opts) => {
     const stats = require("../modules/stats.js");
     const MAX_CONNECTIONS_PER_IP = 3;
+    const MAX_PAYLOAD_SIZE = 2048;
     const connections = {};
     const clients = new WeakMap();
 

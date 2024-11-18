@@ -1,8 +1,11 @@
+require("dotenv").config();
 const fastify = require("fastify");
 const path = require("path");
 const fastifyStatic = require("@fastify/static");
 const pov = require("@fastify/view");
 const rateLimit = require("@fastify/rate-limit");
+const cors = require("@fastify/cors");
+const fastifyHelmet = require("@fastify/helmet");
 const ejs = require("ejs");
 const socketioPlugin = require("fastify-socket.io");
 const socketHandlerPlugin = require("./plugins/socketHandlerPlugin.js");
@@ -11,8 +14,16 @@ const ytdlPlugin = require("./plugins/ytdlPlugin.js");
 
 const server = fastify({ logger: true });
 
+server.register(fastifyHelmet, {
+  contentSecurityPolicy: false
+});
+
+server.register(cors, {
+  origin: ["https://sk1d.org"]
+});
+
 server.register(rateLimit, {
-  max: 100,
+  max: 75,
   timeWindow: 1000*60
 });
 
@@ -32,21 +43,14 @@ server.register(pov, {
   root: path.join(__dirname, "views")
 });
 
-server.get("/api/online", (req, rep)=>{
-  rep.send(server.io.engine.clientsCount);
-});
-
-server.get("/api/views", (req, rep)=>{
-  rep.send(server.uniqueIPs.size);
-});
-
 server.addHook("onRequest", async (req, rep)=>{
-  server.uniqueIPs.add(req.ip);
+  const ip = req.headers["x-real-ip"];
+  if (ip) server.uniqueIPs.add(ip);
 });
 
 const start = async () => {
   try {
-    await server.listen({ port: 3000, host: "0.0.0.0" });
+    await server.listen({ port: process.env.PORT, host: "127.0.0.1" });
   } catch (err) {
     server.log.error(err);
     process.exit(1);
